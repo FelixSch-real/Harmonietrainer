@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonielehre Trainer – Dreiklänge & Vierklänge meistern</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        music: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            900: '#4c1d95'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .piano-key {
+            transition: all 0.1s ease;
+        }
+        .piano-key:active, .piano-key.active {
+            filter: brightness(0.85);
+            transform: translateY(2px);
+        }
+        /* Card Flip Animation Styles */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-purple-600 to-indigo-500 p-2 rounded-xl shadow-lg shadow-purple-500/20">
+                    <i data-lucide="music" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-purple-400 bg-clip-text text-transparent">Akkord-Meister</h1>
+                    <p class="text-xs text-slate-400">Vokabeltrainer für 3- & 4-Klänge</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="hidden md:flex space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button onclick="switchTab('trainer')" id="nav-trainer" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-purple-600 text-white shadow-md">
+                    <i data-lucide="award" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i> Vokabel-Trainer
+                </button>
+                <button onclick="switchTab('stats')" id="nav-stats" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i> Statistik & Fehler
+                </button>
+                <button onclick="switchTab('reference')" id="nav-reference" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="book-open" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i> Lexikon
+                </button>
+                <button onclick="switchTab('keyboard')" id="nav-keyboard" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="disc" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i> Klavier
+                </button>
+            </nav>
+
+            <!-- Stats Bar (Streak & Score) -->
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-1.5 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-full text-amber-400 text-xs font-semibold">
+                    <i data-lucide="flame" class="w-4 h-4 fill-amber-400"></i>
+                    <span id="streak-count">0</span> Streak
+                </div>
+                <div class="flex items-center space-x-1.5 bg-purple-500/10 border border-purple-500/30 px-3 py-1.5 rounded-full text-purple-400 text-xs font-semibold">
+                    <i data-lucide="star" class="w-4 h-4 fill-purple-400"></i>
+                    <span id="score-count">0</span> Pkt
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Navigation -->
+        <div class="md:hidden flex border-t border-slate-800 bg-slate-900 overflow-x-auto">
+            <button onclick="switchTab('trainer')" id="mob-nav-trainer" class="flex-1 py-3 px-2 text-xs font-medium text-center text-purple-400 border-b-2 border-purple-500 whitespace-nowrap">Trainer</button>
+            <button onclick="switchTab('stats')" id="mob-nav-stats" class="flex-1 py-3 px-2 text-xs font-medium text-center text-slate-400 whitespace-nowrap">Statistik</button>
+            <button onclick="switchTab('reference')" id="mob-nav-reference" class="flex-1 py-3 px-2 text-xs font-medium text-center text-slate-400 whitespace-nowrap">Lexikon</button>
+            <button onclick="switchTab('keyboard')" id="mob-nav-keyboard" class="flex-1 py-3 px-2 text-xs font-medium text-center text-slate-400 whitespace-nowrap">Klavier</button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- SECTION 1: VOCABULARY TRAINER (FLASHCARD) -->
+        <section id="section-trainer" class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/40 p-6 rounded-2xl border border-slate-800/80 shadow-xl">
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <i data-lucide="layers" class="w-5 h-5 text-purple-400"></i> Akkord-Vokabeltrainer
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Überlege dir die Lösung, decke die Karte auf und bewerte dich selbst nach dem Vokabel-Prinzip.</p>
+                </div>
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="trainer-mode-select" onchange="resetTrainer()" class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="notes_from_name">Frage: Name &rarr; Welche Töne?</option>
+                        <option value="name_from_notes">Frage: Töne &rarr; Welcher Name?</option>
+                    </select>
+                    <select id="trainer-category-select" onchange="resetTrainer()" class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="all">Alle Dreiklänge & Vierklänge</option>
+                        <option value="triads">Nur Dreiklänge</option>
+                        <option value="sevenths">Nur Vierklänge</option>
+                        <option value="mistakes">⚠️ Fehler-Wiederholungsmodus</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Flashcard Container -->
+            <div class="max-w-2xl mx-auto perspective-1000 my-8">
+                <div id="flashcard" class="relative w-full h-80 sm:h-96 duration-500 transform-style-3d cursor-pointer shadow-2xl rounded-3xl border border-slate-800" onclick="flipCard()">
+                    
+                    <!-- FRONT OF CARD (Question) -->
+                    <div class="absolute inset-0 w-full h-full bg-slate-900/90 backdrop-blur-md rounded-3xl p-8 flex flex-col justify-between backface-hidden border border-slate-800/80">
+                        <div class="flex items-center justify-between">
+                            <span id="trainer-card-category" class="text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-950/60 px-3 py-1 rounded-full border border-purple-800/50">Dreiklang</span>
+                            <span class="text-xs text-slate-500">Zum Umdrehen anklicken</span>
+                        </div>
+                        <div class="text-center my-auto">
+                            <span id="trainer-prompt-label" class="text-slate-400 text-sm block mb-3">Welche Töne gehören zu:</span>
+                            <h3 id="trainer-prompt-main" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Dmaj7 (Großer Septakkord)</h3>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 text-purple-400 text-sm font-medium">
+                            <i data-lucide="rotate-cw" class="w-4 h-4"></i> Antwort aufdecken
+                        </div>
+                    </div>
+
+                    <!-- BACK OF CARD (Answer) -->
+                    <div class="absolute inset-0 w-full h-full bg-slate-900/95 backdrop-blur-md rounded-3xl p-8 flex flex-col justify-between backface-hidden rotate-y-180 border border-purple-500/30">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800/50">Lösung</span>
+                            <button onclick="event.stopPropagation(); playCurrentTrainerChord();" class="flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium shadow-md transition-all">
+                                <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> Anhören
+                            </button>
+                        </div>
+                        <div class="text-center my-auto space-y-2">
+                            <h3 id="trainer-answer-main" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono">D - F# - A - C#</h3>
+                            <p id="trainer-answer-details" class="text-xs text-slate-400 max-w-md mx-auto">Intervallformel: 1 - 3 - 5 - 7</p>
+                        </div>
+                        <div class="text-center text-xs text-slate-500">
+                            Wie gut hast du gewusst?
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Self-Assessment Buttons (Visible when card is flipped) -->
+            <div id="self-assessment-container" class="max-w-2xl mx-auto hidden flex gap-4 animate-fadeIn">
+                <button onclick="rateCard(false)" class="flex-1 bg-rose-950/40 hover:bg-rose-900/50 border border-rose-500/50 text-rose-300 font-semibold py-3.5 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="x-circle" class="w-5 h-5"></i> Nicht gewusst (-1)
+                </button>
+                <button onclick="rateCard(true)" class="flex-1 bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/50 text-emerald-300 font-semibold py-3.5 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> Gewusst! (+10 Pkt)
+                </button>
+            </div>
+            
+            <div id="flip-hint-container" class="max-w-2xl mx-auto text-center">
+                <button onclick="flipCard()" class="bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-200 font-medium px-6 py-3 rounded-2xl shadow-md transition-all text-sm inline-flex items-center gap-2">
+                    <i data-lucide="rotate-cw" class="w-4 h-4 text-purple-400"></i> Karte umdrehen
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: STATISTICS & MISTAKE MANAGER -->
+        <section id="section-stats" class="hidden space-y-6">
+            <div class="bg-slate-900/40 p-6 rounded-2xl border border-slate-800/80 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5 text-purple-400"></i> Lernstatistik & Fehleranalyse
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Hier siehst du deine Erfolgsquote und welche Akkorde du am häufigsten wiederholen musst.</p>
+                </div>
+                <button onclick="resetStats()" class="bg-slate-900 hover:bg-rose-950/40 border border-slate-700 hover:border-rose-500/50 text-slate-300 hover:text-rose-300 px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Statistik zurücksetzen
+                </button>
+            </div>
+
+            <!-- Overview KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                    <span class="text-xs uppercase text-slate-400 font-semibold block mb-1">Gelernt / Geklickt</span>
+                    <span id="stat-total-reviews" class="text-3xl font-extrabold text-white">0</span>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                    <span class="text-xs uppercase text-slate-400 font-semibold block mb-1">Erfolgsquote</span>
+                    <span id="stat-success-rate" class="text-3xl font-extrabold text-emerald-400">0%</span>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                    <span class="text-xs uppercase text-slate-400 font-semibold block mb-1">Fehler im Pool</span>
+                    <span id="stat-mistakes-count" class="text-3xl font-extrabold text-rose-400">0</span>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                    <span class="text-xs uppercase text-slate-400 font-semibold block mb-1">Aktueller Streak</span>
+                    <span id="stat-streak-display" class="text-3xl font-extrabold text-amber-400">0</span>
+                </div>
+            </div>
+
+            <!-- Detailed Mistakes Breakdown List -->
+            <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+                <h3 class="font-bold text-white text-lg flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-5 h-5 text-rose-400"></i> Aktuelle Problem-Akkorde
+                </h3>
+                <p class="text-xs text-slate-400">Akkorde, die du mindestens einmal als „Nicht gewusst“ markiert hast, landen hier zum gezielten Üben.</p>
+                
+                <div id="mistakes-list-container" class="space-y-2 mt-4 max-h-80 overflow-y-auto pr-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: REFERENCE / CHORD LEXICON -->
+        <section id="section-reference" class="hidden space-y-6">
+            <div class="bg-slate-900/40 p-6 rounded-2xl border border-slate-800/80 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5 text-purple-400"></i> Akkord-Lexikon & Referenz
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Übersicht aller wichtigen Dreiklänge und Vierklänge mit Struktur und Intervallen.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="filterLexicon('all')" id="lex-btn-all" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-600 text-white transition-all">Alle</button>
+                    <button onclick="filterLexicon('triad')" id="lex-btn-triad" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all">Dreiklänge</button>
+                    <button onclick="filterLexicon('seventh')" id="lex-btn-seventh" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all">Vierklänge</button>
+                </div>
+            </div>
+
+            <!-- Lexicon Grid -->
+            <div id="lexicon-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated lexicon cards -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: VIRTUAL KEYBOARD -->
+        <section id="section-keyboard" class="hidden space-y-6">
+            <div class="bg-slate-900/40 p-6 rounded-2xl border border-slate-800/80 shadow-xl">
+                <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                    <i data-lucide="disc" class="w-5 h-5 text-purple-400"></i> Virtuelles Klavier & Akkord-Analyser
+                </h2>
+                <p class="text-slate-400 text-sm mt-1">Klicke Tasten an, um Töne zu hören oder wähle einen Akkord aus, um ihn auf der Klaviatur zu sehen.</p>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+                <!-- Chord Selector Toolbar -->
+                <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium text-slate-300">Akkord wählen:</label>
+                        <select id="keyboard-chord-root" onchange="updateVisualPiano()" class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <option value="C">C</option>
+                            <option value="C#">C# / Db</option>
+                            <option value="D">D</option>
+                            <option value="D#">D# / Eb</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                            <option value="F#">F# / Gb</option>
+                            <option value="G">G</option>
+                            <option value="G#">G# / Ab</option>
+                            <option value="A">A</option>
+                            <option value="A#">A# / Bb</option>
+                            <option value="B">B / H</option>
+                        </select>
+                        <select id="keyboard-chord-type" onchange="updateVisualPiano()" class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <button onclick="playSelectedVisualChord()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg shadow-purple-600/25 transition-all flex items-center gap-2">
+                        <i data-lucide="volume-2" class="w-4 h-4"></i> Abspielen
+                    </button>
+                </div>
+
+                <!-- Piano Display Container -->
+                <div class="relative bg-slate-950 p-6 rounded-2xl border border-slate-800 overflow-x-auto">
+                    <div id="piano-keyboard" class="relative flex justify-center min-w-[700px] h-48 select-none">
+                        <!-- Piano keys injected via script -->
+                    </div>
+                </div>
+
+                <!-- Info Box about selected chord -->
+                <div id="keyboard-chord-info" class="bg-slate-950/40 p-4 rounded-2xl border border-slate-800 text-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-slate-400 text-xs block">Noten im Akkord:</span>
+                        <span id="keyboard-notes-display" class="font-bold text-lg text-white">C - E - G</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 text-xs block">Intervall-Formel:</span>
+                        <span id="keyboard-formula-display" class="font-semibold text-purple-400">1 - 3 - 5</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 bg-slate-950 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>Harmonielehre Trainer &bull; Vokabeltrainer-Modus &bull; Web Audio API Sound</p>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // --- CHORD DATABASE ---
+        const CHORD_TYPES = [
+            // Triads (Dreiklänge)
+            { id: 'maj', name: 'Dur (maj)', category: 'triad', formula: ['1', '3', '5'], semitones: [0, 4, 7], desc: 'Der klassische, helle und fröhliche Klang.' },
+            { id: 'min', name: 'Moll (m)', category: 'triad', formula: ['1', 'b3', '5'], semitones: [0, 3, 7], desc: 'Der dunklere, melancholische und weiche Klang.' },
+            { id: 'dim', name: 'Vermindert (dim)', category: 'triad', formula: ['1', 'b3', 'b5'], semitones: [0, 3, 6], desc: 'Sehr spannungsreich und instabil durch kleine Terz und verminderte Quinte.' },
+            { id: 'aug', name: 'Übermäßig (aug)', category: 'triad', formula: ['1', '3', '#5'], semitones: [0, 4, 8], desc: 'Sphärischer, schwebender Klang durch zwei übereinandergeschichtete große Terzen.' },
+            
+            // Four-note Chords (Vierklänge / Seventh Chords)
+            { id: 'maj7', name: 'Großer Septakkord (maj7)', category: 'seventh', formula: ['1', '3', '5', '7'], semitones: [0, 4, 7, 11], desc: 'Elegant, jazzig und warm; Grundakkord mit großer Septime.' },
+            { id: 'm7', name: 'Kleiner Septakkord (m7)', category: 'seventh', formula: ['1', 'b3', '5', 'b7'], semitones: [0, 3, 7, 10], desc: 'Der typische Jazz-Moll-Akkord, entspannt und bluesig.' },
+            { id: '7', name: 'Dominantseptakkord (7)', category: 'seventh', formula: ['1', '3', '5', 'b7'], semitones: [0, 4, 7, 10], desc: 'Bringt starke Zwangsläufigkeit zur Auflösung (Tonika).' },
+            { id: 'm7b5', name: 'Halbverminderter Septakkord (m7♭5)', category: 'seventh', formula: ['1', 'b3', 'b5', 'b7'], semitones: [0, 3, 6, 10], desc: 'Auch als ø7 bekannt, essenziell für die II-V-I Verbindung in Moll.' },
+            { id: 'dim7', name: 'Vollverminderter Septakkord (dim7)', category: 'seventh', formula: ['1', 'b3', 'b5', 'bb7'], semitones: [0, 3, 6, 9], desc: 'Maximale Symmetrie und Spannung, besteht nur aus kleinen Terzen.' }
+        ];
+
+        const NOTE_NAMES_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        
+        const ROOTS = [
+            { name: 'C', baseFreq: 261.63, semitone: 0 },
+            { name: 'C#', baseFreq: 277.18, semitone: 1 },
+            { name: 'D', baseFreq: 293.66, semitone: 2 },
+            { name: 'D#', baseFreq: 311.13, semitone: 3 },
+            { name: 'E', baseFreq: 329.63, semitone: 4 },
+            { name: 'F', baseFreq: 349.23, semitone: 5 },
+            { name: 'F#', baseFreq: 369.99, semitone: 6 },
+            { name: 'G', baseFreq: 392.00, semitone: 7 },
+            { name: 'G#', baseFreq: 415.30, semitone: 8 },
+            { name: 'A', baseFreq: 440.00, semitone: 9 },
+            { name: 'A#', baseFreq: 466.16, semitone: 10 },
+            { name: 'B', baseFreq: 493.88, semitone: 11 }
+        ];
+
+        // --- APP STATE & LOCALSTORAGE STATS ---
+        let userStats = {
+            score: 0,
+            streak: 0,
+            totalReviews: 0,
+            correctReviews: 0,
+            mistakes: {} // key: chordAbbr (e.g. "Dmaj7"), value: errorCount
+        };
+
+        function loadStats() {
+            const saved = localStorage.getItem('chord_trainer_stats');
+            if (saved) {
+                try {
+                    userStats = JSON.parse(saved);
+                } catch(e) { console.error(e); }
+            }
+            updateStatsUI();
+        }
+
+        function saveStats() {
+            localStorage.setItem('chord_trainer_stats', JSON.stringify(userStats));
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            document.getElementById('score-count').textContent = userStats.score;
+            document.getElementById('streak-count').textContent = userStats.streak;
+            document.getElementById('stat-streak-display').textContent = userStats.streak;
+            document.getElementById('stat-total-reviews').textContent = userStats.totalReviews;
+            
+            const rate = userStats.totalReviews > 0 ? Math.round((userStats.correctReviews / userStats.totalReviews) * 100) : 0;
+            document.getElementById('stat-success-rate').textContent = rate + '%';
+
+            const mistakeKeys = Object.keys(userStats.mistakes);
+            document.getElementById('stat-mistakes-count').textContent = mistakeKeys.length;
+
+            renderMistakesList();
+        }
+
+        function resetStats() {
+            if (confirm("Möchtest du wirklich alle Statistiken und Fehler zurücksetzen?")) {
+                userStats = { score: 0, streak: 0, totalReviews: 0, correctReviews: 0, mistakes: {} };
+                saveStats();
+                resetTrainer();
+            }
+        }
+
+        // --- AUDIO SYNTHESIZER ---
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playTone(frequency, duration = 1.2) {
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.001, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + duration);
+            } catch (e) {
+                console.error("Audio error:", e);
+            }
+        }
+
+        function playChordFrequencies(frequencies) {
+            frequencies.forEach((freq, index) => {
+                setTimeout(() => {
+                    playTone(freq, 1.8);
+                }, index * 40);
+            });
+        }
+
+        // --- TAB SWITCHING ---
+        let activeTab = 'trainer';
+
+        function switchTab(tabId) {
+            activeTab = tabId;
+            ['trainer', 'stats', 'reference', 'keyboard'].forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                const btn = document.getElementById(`nav-${t}`);
+                const mobBtn = document.getElementById(`mob-nav-${t}`);
+                
+                if (t === tabId) {
+                    sec.classList.remove('hidden');
+                    if (btn) btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-purple-600 text-white shadow-md";
+                    if (mobBtn) mobBtn.className = "flex-1 py-3 px-2 text-xs font-medium text-center text-purple-400 border-b-2 border-purple-500 whitespace-nowrap";
+                } else {
+                    sec.classList.add('hidden');
+                    if (btn) btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800";
+                    if (mobBtn) mobBtn.className = "flex-1 py-3 px-2 text-xs font-medium text-center text-slate-400 whitespace-nowrap";
+                }
+            });
+            
+            if (tabId === 'reference') {
+                renderLexicon('all');
+            } else if (tabId === 'keyboard') {
+                initVisualKeyboardSelects();
+                updateVisualPiano();
+            } else if (tabId === 'stats') {
+                updateStatsUI();
+            }
+        }
+
+        // --- VOCABULARY TRAINER LOGIC ---
+        let currentCard = null;
+        let isCardFlipped = false;
+
+        function getNotesForChord(rootIndex, semitones) {
+            return semitones.map(st => {
+                const idx = (rootIndex + st) % 12;
+                return NOTE_NAMES_SHARP[idx];
+            });
+        }
+
+        function getFrequenciesForChord(rootObj, semitones) {
+            return semitones.map(st => rootObj.baseFreq * Math.pow(2, st / 12));
+        }
+
+        function generateCard() {
+            isCardFlipped = false;
+            document.getElementById('flashcard').classList.remove('rotate-y-180');
+            document.getElementById('self-assessment-container').classList.add('hidden');
+            document.getElementById('flip-hint-container').classList.remove('hidden');
+
+            const categoryFilter = document.getElementById('trainer-category-select').value;
+            const mode = document.getElementById('trainer-mode-select').value;
+
+            let randomRoot, randomChord;
+
+            if (categoryFilter === 'mistakes') {
+                const mistakeKeys = Object.keys(userStats.mistakes);
+                if (mistakeKeys.length === 0) {
+                    // Fallback if no mistakes
+                    alert("Keine Fehler im Pool! Du hast aktuell alle Fehler gemeistert. Wechsle zu 'Alle Dreiklänge & Vierklänge'.");
+                    document.getElementById('trainer-category-select').value = 'all';
+                    generateCard();
+                    return;
+                }
+                // Pick a random mistake key (e.g., "Dmaj7")
+                const chosenKey = mistakeKeys[Math.floor(Math.random() * mistakeKeys.length)];
+                // Parse root and chord type
+                // Root is first char or 2 chars if sharp (#)
+                let rootName = chosenKey.substring(0, 1);
+                let typeId = chosenKey.substring(1);
+                if (chosenKey.substring(1, 2) === '#') {
+                    rootName = chosenKey.substring(0, 2);
+                    typeId = chosenKey.substring(2);
+                }
+                randomRoot = ROOTS.find(r => r.name === rootName) || ROOTS[0];
+                randomChord = CHORD_TYPES.find(c => c.id === typeId) || CHORD_TYPES[0];
+            } else {
+                let availableChords = CHORD_TYPES;
+                if (categoryFilter === 'triads') {
+                    availableChords = CHORD_TYPES.filter(c => c.category === 'triad');
+                } else if (categoryFilter === 'sevenths') {
+                    availableChords = CHORD_TYPES.filter(c => c.category === 'seventh');
+                }
+                randomRoot = ROOTS[Math.floor(Math.random() * ROOTS.length)];
+                randomChord = availableChords[Math.floor(Math.random() * availableChords.length)];
+            }
+
+            const chordNotes = getNotesForChord(randomRoot.semitone, randomChord.semitones);
+            const chordFreqs = getFrequenciesForChord(randomRoot, randomChord.semitones);
+            const chordAbbr = `${randomRoot.name}${randomChord.id}`;
+            const chordFullName = `${chordAbbr} (${randomChord.name})`;
+
+            currentCard = {
+                root: randomRoot,
+                chordType: randomChord,
+                notes: chordNotes,
+                frequencies: chordFreqs,
+                fullName: chordFullName,
+                abbr: chordAbbr,
+                mode: mode
+            };
+
+            renderCardUI();
+        }
+
+        function renderCardUI() {
+            const catBadge = document.getElementById('trainer-card-category');
+            const promptLabel = document.getElementById('trainer-prompt-label');
+            const promptMain = document.getElementById('trainer-prompt-main');
+            const answerMain = document.getElementById('trainer-answer-main');
+            const answerDetails = document.getElementById('trainer-answer-details');
+
+            catBadge.textContent = currentCard.chordType.category === 'triad' ? 'Dreiklang' : 'Vierklang';
+
+            if (currentCard.mode === 'notes_from_name') {
+                promptLabel.textContent = "Welche Töne gehören zu diesem Akkord?";
+                promptMain.textContent = currentCard.fullName;
+                
+                answerMain.textContent = currentCard.notes.join(' - ');
+                answerDetails.innerHTML = `Formel: <strong>${currentCard.chordType.formula.join(' - ')}</strong> &bull; ${currentCard.chordType.desc}`;
+            } else {
+                promptLabel.textContent = "Wie heißt dieser Akkord?";
+                promptMain.textContent = currentCard.notes.join(' - ');
+
+                answerMain.textContent = currentCard.fullName;
+                answerDetails.innerHTML = `Formel: <strong>${currentCard.chordType.formula.join(' - ')}</strong> &bull; ${currentCard.chordType.desc}`;
+            }
+        }
+
+        function flipCard() {
+            const cardEl = document.getElementById('flashcard');
+            isCardFlipped = !isCardFlipped;
+            if (isCardFlipped) {
+                cardEl.classList.add('rotate-y-180');
+                document.getElementById('self-assessment-container').classList.remove('hidden');
+                document.getElementById('flip-hint-container').classList.add('hidden');
+                // Play sound automatically on flip
+                playChordFrequencies(currentCard.frequencies);
+            } else {
+                cardEl.classList.remove('rotate-y-180');
+                document.getElementById('self-assessment-container').classList.add('hidden');
+                document.getElementById('flip-hint-container').classList.remove('hidden');
+            }
+        }
+
+        function playCurrentTrainerChord() {
+            if (currentCard) {
+                playChordFrequencies(currentCard.frequencies);
+            }
+        }
+
+        function rateCard(known) {
+            userStats.totalReviews++;
+            const chordKey = currentCard.abbr;
+
+            if (known) {
+                userStats.correctReviews++;
+                userStats.score += 10;
+                userStats.streak += 1;
+                // Remove from mistakes if present
+                if (userStats.mistakes[chordKey]) {
+                    delete userStats.mistakes[chordKey];
+                }
+            } else {
+                userStats.streak = 0;
+                // Add or increment mistake
+                userStats.mistakes[chordKey] = (userStats.mistakes[chordKey] || 0) + 1;
+            }
+
+            saveStats();
+            generateCard();
+        }
+
+        function resetTrainer() {
+            generateCard();
+        }
+
+        // --- MISTAKES LIST RENDERING ---
+        function renderMistakesList() {
+            const container = document.getElementById('mistakes-list-container');
+            container.innerHTML = '';
+
+            const keys = Object.keys(userStats.mistakes);
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="p-4 rounded-2xl bg-slate-950/40 border border-slate-800 text-center text-slate-500 text-sm">Keine Fehler vorhanden. Großartig!</div>`;
+                return;
+            }
+
+            keys.forEach(key => {
+                const count = userStats.mistakes[key];
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 text-sm";
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="bg-rose-950/80 border border-rose-800 text-rose-300 font-bold px-3 py-1 rounded-xl text-xs">${count}x Fehler</div>
+                        <span class="font-bold text-white text-base">${key}</span>
+                    </div>
+                    <button onclick="practiceSpecificMistake('${key}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all shadow-md">
+                        Jetzt üben
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function practiceSpecificMistake(chordKey) {
+            // Switch to trainer and set mode to mistakes
+            document.getElementById('trainer-category-select').value = 'mistakes';
+            switchTab('trainer');
+            // Force generate card matching this key
+            let rootName = chordKey.substring(0, 1);
+            let typeId = chordKey.substring(1);
+            if (chordKey.substring(1, 2) === '#') {
+                rootName = chordKey.substring(0, 2);
+                typeId = chordKey.substring(2);
+            }
+            const rObj = ROOTS.find(r => r.name === rootName) || ROOTS[0];
+            const cObj = CHORD_TYPES.find(c => c.id === typeId) || CHORD_TYPES[0];
+            const chordNotes = getNotesForChord(rObj.semitone, cObj.semitones);
+            const chordFreqs = getFrequenciesForChord(rObj, cObj.semitones);
+            const chordFullName = `${chordKey} (${cObj.name})`;
+
+            isCardFlipped = false;
+            document.getElementById('flashcard').classList.remove('rotate-y-180');
+            document.getElementById('self-assessment-container').classList.add('hidden');
+            document.getElementById('flip-hint-container').classList.remove('hidden');
+
+            currentCard = {
+                root: rObj,
+                chordType: cObj,
+                notes: chordNotes,
+                frequencies: chordFreqs,
+                fullName: chordFullName,
+                abbr: chordKey,
+                mode: document.getElementById('trainer-mode-select').value
+            };
+            renderCardUI();
+        }
+
+        // --- LEXICON RENDERING ---
+        function renderLexicon(filter) {
+            const grid = document.getElementById('lexicon-grid');
+            grid.innerHTML = '';
+
+            let chords = CHORD_TYPES;
+            if (filter === 'triad') {
+                chords = CHORD_TYPES.filter(c => c.category === 'triad');
+                document.getElementById('lex-btn-triad').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-600 text-white transition-all";
+                document.getElementById('lex-btn-seventh').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all";
+                document.getElementById('lex-btn-all').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all";
+            } else if (filter === 'seventh') {
+                chords = CHORD_TYPES.filter(c => c.category === 'seventh');
+                document.getElementById('lex-btn-seventh').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-600 text-white transition-all";
+                document.getElementById('lex-btn-triad').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all";
+                document.getElementById('lex-btn-all').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all";
+            } else {
+                document.getElementById('lex-btn-all').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-600 text-white transition-all";
+                document.getElementById('lex-btn-triad').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all";
+                document.getElementById('lex-btn-seventh').className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition-all";
+            }
+
+            chords.forEach(chord => {
+                const sampleNotes = getNotesForChord(0, chord.semitones).join(' - ');
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/80 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between hover:border-purple-500/50 transition-all";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs uppercase tracking-wider font-semibold px-2.5 py-1 rounded-full ${chord.category === 'triad' ? 'bg-indigo-950 text-indigo-300 border border-indigo-800' : 'bg-purple-950 text-purple-300 border border-purple-800'}">
+                                ${chord.category === 'triad' ? 'Dreiklang' : 'Vierklang'}
+                            </span>
+                            <span class="text-xs font-mono text-purple-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">${chord.formula.join(' - ')}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">C ${chord.name}</h3>
+                        <p class="text-xs text-slate-400 mb-4">${chord.desc}</p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80 mb-4">
+                            <span class="text-[10px] uppercase text-slate-500 block mb-0.5">Beispiel (Grundton C):</span>
+                            <span class="font-mono text-sm text-slate-200 font-semibold">${sampleNotes}</span>
+                        </div>
+                    </div>
+                    <button onclick="playLexiconChord(${chord.semitones.join(',')})" class="w-full bg-slate-800 hover:bg-purple-600 text-slate-200 hover:text-white py-2.5 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> Anklingen (C)
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        function playLexiconChord(...semitones) {
+            const rootObj = ROOTS[0];
+            const freqs = getFrequenciesForChord(rootObj, semitones);
+            playChordFrequencies(freqs);
+        }
+
+        function filterLexicon(type) {
+            renderLexicon(type);
+        }
+
+        // --- VIRTUAL KEYBOARD LOGIC ---
+        function initVisualKeyboardSelects() {
+            const typeSelect = document.getElementById('keyboard-chord-type');
+            if (typeSelect.options.length === 0) {
+                CHORD_TYPES.forEach(chord => {
+                    const opt = document.createElement('option');
+                    opt.value = chord.id;
+                    opt.textContent = chord.name;
+                    typeSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function updateVisualPiano() {
+            const rootVal = document.getElementById('keyboard-chord-root').value;
+            const typeVal = document.getElementById('keyboard-chord-type').value;
+
+            const rootObj = ROOTS.find(r => r.name === rootVal);
+            const chordObj = CHORD_TYPES.find(c => c.id === typeVal);
+
+            const chordNotes = getNotesForChord(rootObj.semitone, chordObj.semitones);
+            const chordFreqs = getFrequenciesForChord(rootObj, chordObj.semitones);
+
+            document.getElementById('keyboard-notes-display').textContent = chordNotes.join(' - ');
+            document.getElementById('keyboard-formula-display').textContent = chordObj.formula.join(' - ');
+
+            const pianoContainer = document.getElementById('piano-keyboard');
+            pianoContainer.innerHTML = '';
+
+            const startNote = 48; // C3
+            const totalKeys = 25;
+            const activeSemis = chordObj.semitones.map(st => (rootObj.semitone + st) % 12);
+
+            let whiteKeyIndex = 0;
+            const whiteKeyWidth = 44;
+
+            for (let i = 0; i < totalKeys; i++) {
+                const midiNote = startNote + i;
+                const noteInOctave = midiNote % 12;
+                const noteName = NOTE_NAMES_SHARP[noteInOctave];
+                const isBlack = [1, 3, 6, 8, 10].includes(noteInOctave);
+
+                if (!isBlack) {
+                    const keyEl = document.createElement('div');
+                    const isActive = activeSemis.includes(noteInOctave);
+                    const freq = 261.63 * Math.pow(2, (midiNote - 60) / 12);
+
+                    keyEl.className = `piano-key absolute top-0 h-44 w-[42px] rounded-b-xl border border-slate-300 flex flex-col justify-end items-center pb-3 cursor-pointer text-xs font-semibold shadow-sm ${isActive ? 'bg-purple-400 text-purple-950 border-purple-500 ring-2 ring-purple-400' : 'bg-white text-slate-700 hover:bg-slate-100'}`;
+                    keyEl.style.left = `${whiteKeyIndex * whiteKeyWidth}px`;
+                    keyEl.innerHTML = `<span class="pointer-events-none">${noteName}</span>`;
+                    
+                    keyEl.onmousedown = () => {
+                        playTone(freq, 1.0);
+                        keyEl.classList.add('active');
+                        setTimeout(() => keyEl.classList.remove('active'), 150);
+                    };
+
+                    pianoContainer.appendChild(keyEl);
+                    whiteKeyIndex++;
+                }
+            }
+
+            whiteKeyIndex = 0;
+            for (let i = 0; i < totalKeys; i++) {
+                const midiNote = startNote + i;
+                const noteInOctave = midiNote % 12;
+                const noteName = NOTE_NAMES_SHARP[noteInOctave];
+                const isBlack = [1, 3, 6, 8, 10].includes(noteInOctave);
+
+                if (isBlack) {
+                    const keyEl = document.createElement('div');
+                    const isActive = activeSemis.includes(noteInOctave);
+                    const freq = 261.63 * Math.pow(2, (midiNote - 60) / 12);
+                    let leftOffset = (whiteKeyIndex * whiteKeyWidth) - 14;
+
+                    keyEl.className = `piano-key absolute top-0 h-28 w-[28px] rounded-b-lg border border-slate-900 flex flex-col justify-end items-center pb-2 cursor-pointer text-[10px] font-semibold z-10 ${isActive ? 'bg-purple-600 text-white border-purple-400 ring-2 ring-purple-400' : 'bg-slate-900 text-slate-300 hover:bg-slate-800'}`;
+                    keyEl.style.left = `${leftOffset}px`;
+                    keyEl.innerHTML = `<span class="pointer-events-none">${noteName}</span>`;
+
+                    keyEl.onmousedown = () => {
+                        playTone(freq, 1.0);
+                        keyEl.classList.add('active');
+                        setTimeout(() => keyEl.classList.remove('active'), 150);
+                    };
+
+                    pianoContainer.appendChild(keyEl);
+                } else {
+                    whiteKeyIndex++;
+                }
+            }
+        }
+
+        function playSelectedVisualChord() {
+            const rootVal = document.getElementById('keyboard-chord-root').value;
+            const typeVal = document.getElementById('keyboard-chord-type').value;
+            const rootObj = ROOTS.find(r => r.name === rootVal);
+            const chordObj = CHORD_TYPES.find(c => c.id === typeVal);
+            const freqs = getFrequenciesForChord(rootObj, chordObj.semitones);
+            playChordFrequencies(freqs);
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+            loadStats();
+            generateCard();
+        };
+    </script>
+</body>
+</html>
